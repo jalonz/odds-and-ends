@@ -4,7 +4,7 @@
 
 An interactive index of Japanese village life from the Jōmon period (~14,000 BCE) to the present. Each of eighteen historical eras is scored 0–10 on how well village-level economies functioned as self-contained systems, assessed across four dimensions: role specialization, surplus generation, governance autonomy, and trade ecology closure. Scores are interpretive.
 
-**[Live demo →](./japanese_village_flourishing_timeline.html)**
+**[Live demo →](https://jalonz.github.io/odds-and-ends/japanese_villages/japanese_village_flourishing_timeline.html)**
 
 ---
 
