@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japanese Village Flourishing — Era Timeline</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0a;display:flex;justify-content:center;padding:32px 16px;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+#app{width:100%;max-width:760px}
+h1{font-size:14px;font-weight:500;color:#5e5b54;margin-bottom:20px;letter-spacing:.04em}
+
+:root{--dk:#0e0e0e;--dk2:#161616;--dk3:#1e1e1e;--dk4:#252525;--brd:#2e2e2e;--tx1:#e8e5db;--tx2:#a09d94;--tx3:#5e5b54}
+#wrap{background:var(--dk);color:var(--tx1);padding:20px 18px 24px;border-radius:12px}
+#meta{font-size:11px;color:var(--tx3);margin-bottom:12px;letter-spacing:.04em}
+#chart-row{display:flex;gap:3px;height:100px;align-items:flex-end;margin-bottom:2px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.bar-col:hover .bar-inner{opacity:1!important}
+.bar-lbl{font-size:7.5px;color:var(--tx3);margin-top:4px;text-align:center;line-height:1;user-select:none}
+#detail{margin-top:0}
+.d-card{border:0.5px solid var(--brd);border-radius:0 0 10px 10px;padding:16px 18px;background:var(--dk2)}
+.d-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:5px}
+.d-name{font-size:18px;font-weight:500;color:var(--tx1)}
+.d-range{font-size:12px;color:var(--tx3)}
+.d-score{margin-left:auto;font-size:13px;font-weight:500}
+.d-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.d-bar-bg{flex:1;height:3px;background:var(--dk4);border-radius:2px}
+.d-bar-fill{height:3px;border-radius:2px;transition:width .4s}
+.d-label-pill{font-size:10.5px;padding:2px 8px;border-radius:20px;white-space:nowrap;font-weight:500}
+.d-summary{font-size:13px;color:var(--tx2);line-height:1.65;margin-bottom:10px}
+.d-extra{font-size:13px;color:var(--tx2);line-height:1.65;margin-bottom:12px}
+.d-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.d-col-hd{font-size:9.5px;font-weight:500;color:var(--tx3);margin-bottom:5px;letter-spacing:.06em}
+.d-row{font-size:11.5px;color:var(--tx1);padding:3px 0;border-bottom:0.5px solid var(--brd);line-height:1.4}
+.d-notable{background:var(--dk3);border-radius:0 6px 6px 0;padding:10px 13px;margin-bottom:10px}
+.d-notable-hd{font-size:9.5px;font-weight:500;color:var(--tx3);margin-bottom:4px;letter-spacing:.06em}
+.d-notable-txt{font-size:12px;color:var(--tx2);line-height:1.55}
+.d-why{font-size:11.5px;color:var(--tx3);font-style:italic;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="app">
+<h1>JAPANESE VILLAGE LIFE — ERA FLOURISHING INDEX</h1>
+<div id="wrap">
+<div id="meta">Village life flourishing score 0–10 · click any era</div>
+<div id="chart-row"></div>
+<div style="display:flex;gap:3px;margin-bottom:16px" id="lbl-row"></div>
+<div id="detail"></div>
+</div>
+</div>
+
+<script>
+const C={teal:{bar:'#1D9E75',pill:'rgba(29,158,117,.18)',pillTx:'#1D9E75',top:'#1D9E75'},
+green:{bar:'#639922',pill:'rgba(99,153,34,.18)',pillTx:'#97C459',top:'#639922'},
+amber:{bar:'#BA7517',pill:'rgba(186,117,23,.18)',pillTx:'#EF9F27',top:'#BA7517'},
+gray:{bar:'#5F5E5A',pill:'rgba(95,94,90,.18)',pillTx:'#888780',top:'#5F5E5A'}};
+
+const P=[
+{ab:'JOM',name:'Jōmon',range:'~14,000–300 BCE',score:4,tier:'gray',label:'Proto-village community',
+summary:'Semi-sedentary hunter-gatherer communities with distinct communal roles, but trade specialization never developed without a surplus economy. The Jōmon produced the world\'s earliest known pottery (~16,500 BCE) and were far more settled than the nomadic forager label implies — especially in the resource-rich northeast.',
+extra:'Forager, fisher, ritualist, elder, pottery specialist — roles that operated through gift redistribution rather than market exchange. Obsidian from specific volcanic sources moved across hundreds of kilometers, showing long-distance exchange networks, but not yet a village economy. The population density of Tōhoku shellmound sites suggests proto-village social organization centuries before rice agriculture arrived.',
+roles:['Forager / hunter','Fisher','Pottery maker','Shaman / ritualist','Elder / decision-maker','Dogū figurine maker'],
+trades:['Gift and redistribution economy — no markets','Obsidian (long-distance exchange)','Shellfish, nuts, dried fish'],
+notable:'Tōhoku region developed the most complex semi-sedentary settlements, suggesting proto-village social organization centuries before rice agriculture arrived.',
+why:'4 — Communal role differentiation exists but no surplus economy produced trade specialization.'},
+
+{ab:'YAY',name:'Yayoi',range:'~300 BCE–300 CE',score:7,tier:'green',label:'First true surplus villages',
+summary:'Wet-rice agriculture, introduced from the Korean peninsula, created Japan\'s first organized village economies. Moat-surrounded settlements (kankō) document clear social stratification and role specialization organized around the agricultural calendar — for the first time, communities could produce and store more food than they consumed.',
+extra:'Bronze and iron metallurgy arrived alongside rice, enabling better tools and creating the first recognizable craft trade: the smith. Surplus rice became the foundational commodity of Japanese economics for the next two millennia, and the kankō\'s defensive moats suggest that surplus immediately created the problem of defense. Burial archaeology shows stark differentiation — some individuals interred with bronze mirrors and iron weapons, others with nothing. Within a few generations of rice agriculture, Japan had class stratification.',
+roles:['Rice farmer (paddy cultivator)','Bronze / iron smith','Weaver (hemp, early silk)','Village chief (kunimi)','Ritual specialist','Long-distance trader'],
+trades:['Polished rice (surplus commodity)','Bronze tools and mirrors','Hemp cloth','Salt (coastal villages)','Obsidian and jade (exchange goods)'],
+notable:'First evidence of organized surplus exchange across village networks. Social hierarchies visible in burial goods within a few generations of rice agriculture\'s introduction.',
+why:'7 — The first surplus-based specialization and defined community roles at scale.'},
+
+{ab:'KOF',name:'Kofun',range:'~300–538 CE',score:5,tier:'amber',label:'Clan-organized craft villages',
+summary:'Villages organized under uji (clan) control. Immigrant craftsmen (toraijin) arriving from Korea and China introduced advanced specializations — weaving, ironsmithing, horse breeding, writing — that clustered in dedicated mono-trade villages, creating Japan\'s earliest recognizable craft districts.',
+extra:'The keyhole-shaped burial mounds that define this period were labor-intensive projects requiring organized village corvée, but they also drove demand for specialists: haniwa clay figure makers, lacquerworkers, metalcasters. Entire villages of Korean weavers and Chinese scribes were transplanted into Japan. Villages served clan lords rather than an internal market logic, which caps the score.',
+roles:['Uji clan farmer','Haniwa (clay figure) maker','Horse handler / groom','Korean-style weaver','Scribe (introduced skill)','Ironsmith'],
+trades:['Iron tools and weapons','Advanced woven textiles','Horses (new prestige commodity)','Clay mortuary figures'],
+notable:'Toraijin immigrants created entire dedicated craft villages of weavers, metalworkers, and scribes. Horse breeding villages appeared for the first time.',
+why:'5 — Specialization is real but villages serve clan lords, not an internal market logic.'},
+
+{ab:'ASK',name:'Asuka',range:'538–710 CE',score:4,tier:'gray',label:'Administrative reorganization',
+summary:'The Taika Reforms (645 CE) imposed Chinese-style administration, reorganizing villages into ri, gun, and kuni units as tax-collection infrastructure. Buddhism\'s arrival pulled in the other direction — temple construction generated sustained demand for carpenters, metalworkers, lacquerers, and dyers at a scale Japan had not seen before.',
+extra:'Two forces shaped village economic life in this period: the state extracting surplus through a rationalized bureaucracy, and Buddhist institutions consuming craft output through temple patronage. Monasteries became Japan\'s first consistent institutional craft patrons, shaping whole villages around their needs. State corvée labor obligations were heavy, leaving little time for trade between villages. Most of village economic life was either requisitioned upward or consumed by religious production.',
+roles:['Corvée farmer (forced labor)','Temple carpenter','Lacquerware maker','Silk weaver','Local official (gunji)','Buddhist monk (new actor)'],
+trades:['Lacquerware','Silk cloth','Buddhist ritual objects','Rice (as state tax currency)'],
+notable:'Buddhism created a new temple-village economy — monasteries as patrons of metalwork, carpentry, dyeing. State labor demands dominated most village time and energy.',
+why:'4 — Heavy state overlay constrains organic village development despite craft demand from religious institutions.'},
+
+{ab:'NAR',name:'Nara',range:'710–794 CE',score:4,tier:'gray',label:'Tax-unit villages',
+summary:'The ritsuryo system made villages formal tax units with triple tribute obligations: rice, cloth, and labor corvée. The capital\'s infrastructure, court consumption, and Buddhist monument-building all ran on extracted village output.',
+extra:'The Man\'yōshū poetry anthology, compiled during this period, is an accidental historical record of village experience — border guards describing cold nights, fisherwomen singing, farmers lamenting tax debts. Tax burdens were severe enough to drive many registered farmers to abandon their legal status and wander as fugitives, a phenomenon the state repeatedly tried and failed to stop. Villages functioned primarily as extraction points for the imperial center, with little energy or surplus left for internal trade development.',
+roles:['Registered farmer (hyakushō)','Silk / hemp producer','Corvée laborer','Local official (gunshi)','Buddhist monk (tax-exempt)','Itinerant wanderer (tax refugee)'],
+trades:['Rice (primary state tax)','Silk cloth (secondary tax)','Hemp and ramie cloth','Iron tools (limited)'],
+notable:'The Man\'yōshū incidentally preserves vivid records of actual village hardship. Tax burdens drove many registered farmers to abandon their status and wander as ronin-farmers.',
+why:'4 — Villages function primarily as extraction points for the imperial center.'},
+
+{ab:'HEI',name:'Heian',range:'794–1185 CE',score:5,tier:'amber',label:'Shōen estate economy',
+summary:'Shōen (private estates) developed outside the state tax system, creating a two-track village economy. Villages within shōen gradually acquired distinct local identity, customs, and partial autonomy from the imperial administration — the first structural conditions for self-organized community life to re-emerge.',
+extra:'The Heian capital\'s extraordinary cultural development was built entirely on surplus extracted from these villages, but had no connection to the people producing it. By insulating estates from state tax collectors, the shōen structure allowed local agriculture, craft, and shrine-based community identity to develop faster than the ritsuryo system had allowed. Court culture and village life had no meaningful contact during this period.',
+roles:['Myōshu (small landholder)','Shōen estate farmer','Shinto priest (local shrine)','Miko (shrine maiden)','Itinerant performer / entertainer','Estate steward (zaichi ryōshu)'],
+trades:['Shōen rice (untaxed)','Regional specialty crops','Salt (coastal trade)','Timber (mountain villages)'],
+notable:'Shrine-based community identity strengthened outside state control. Villages within shōen developed local customs and governance separate from imperial administration.',
+why:'5 — Shōen autonomy allows organic village life to develop; aristocratic estate owners still control resource decisions.'},
+
+{ab:'KAM',name:'Kamakura',range:'1185–1333 CE',score:6,tier:'green',label:'Za guild emergence',
+summary:'Za (guilds) formed under the patronage of shrines and temples — sake brewers, oil pressers, metalworkers, and paper makers organized monopoly trade rights in exchange for service obligations to their religious sponsors. Double cropping boosted village surplus and created the periodic market towns (ichi) that became nodes of regional trade.',
+extra:'Za guilds emerged under religious rather than state patronage, which meant the state could not easily tax or control them. Religious immunity gave craft communities legal protection ordinary farmers lacked. The periodic market — typically three days per month at road intersections — connected villages into regional economic networks. The warrior class (gokenin) occupied a hybrid position as both fighters and farmers, a class ambiguity the Momoyama reforms would later eliminate.',
+roles:['Gokenin (warrior-peasant hybrid)','Za guild craftsman','Sake brewer','Metalsmith','Zen monk / temple farmer','Market merchant (tōshō)'],
+trades:['Sake','Iron tools','Pressed oil (sesame, camellia)','Woven cloth','Lacquerware','Pottery at periodic markets'],
+notable:'Za guilds are Japan\'s first recognizable trade organizations. Double cropping produced the surplus that fueled market towns at road intersections across the country.',
+why:'6 — Za guilds represent a specialized trade ecology built on village surplus production.'},
+
+{ab:'NBK',name:'Nanbokuchō',range:'1336–1392 CE',score:5,tier:'amber',label:'Forced local autonomy',
+summary:'Civil war between the Northern and Southern imperial courts forced villages into self-organization that peace had never required. Early ikki (collective leagues) appeared as communal self-defense and rudimentary governance mechanisms — the seedbed of the sō-son commune system that followed.',
+extra:'Communities that survived did so by developing durable internal governance structures. Headmen negotiated separately with multiple competing lords. Ji-samurai — warrior-farmers who held weapons and land simultaneously — became the local power brokers. Villages that built collective decision-making capacity in this period were the ones that became fully autonomous sō-son communes in the Muromachi era.',
+roles:['Village militia member','Ji-samurai (warrior-farmer)','Village headman / negotiator','Sake brewer','Itinerant Buddhist monk','Arms and tool supplier'],
+trades:['Food (survival priority)','Arms and armor','Sake','Basic cloth'],
+notable:'War forced communities to experiment with governance structures that matured into the sophisticated sō-son communes of the Muromachi era. Survivors learned durable self-reliance.',
+why:'5 — War-forced autonomy seeds lasting community institutions.'},
+
+{ab:'MUR',name:'Muromachi / Sō-son',range:'1336–1573 CE',score:8,tier:'teal',label:'★ Peak self-governance',
+summary:'Sō-son (惣村) village communes achieved the highest political autonomy in Japanese history — self-governing polities with written law codes (okite), village assemblies with effective voting rights, collective land and water management, and the demonstrated capacity to expel samurai lords by force.',
+extra:'The Yamashiro no Kuni Ikki of 1485–1493 is the clearest example: farmers expelled two warring samurai factions and self-governed Yamashiro Province for eight years using village assemblies. The okite documents that survive show sophisticated legal thinking — rules governing water rights, forest use, conflict resolution, and collective punishment — written by farmers for farmers. Za guilds operated within sō-son frameworks, periodic markets connected villages regionally, and craft specialization reached levels not seen since the Yayoi era.',
+roles:['Sō-son headman (otona)','Village assemblyman (voter)','Za guild craftsman','Oil presser','Sake brewer','Shrine caretaker','Village scribe','Charcoal maker'],
+trades:['Sake','Pressed oil (sesame, camellia)','Silk and ramie cloth','Charcoal (fuel economy)','Timber','Paper (regional specialty)'],
+notable:'Yamashiro no Kuni Ikki (1485–1493): farmers expelled two competing samurai warlords and self-governed for 8 years via village assembly. Multiple villages wrote their own okite — enforceable local law codes.',
+why:'8 — The most politically autonomous villages in Japanese history. Collective self-governance, including the power of expulsion.'},
+
+{ab:'SEN',name:'Sengoku',range:'1467–1615 CE',score:7,tier:'green',label:'Wartime self-sufficiency',
+summary:'The Warring States period forced villages into near-complete self-sufficiency. Ji-samurai (warrior-farmers) blurred the line between soldier and cultivator. Villages actively negotiated protection terms with competing daimyo — extracting tax exemptions, non-interference agreements, and military protection in exchange for loyalty and provisioning.',
+extra:'Headmen were political operators: playing competing lords against each other, forming defensive ikki alliances across villages, maintaining local militias, and managing the intelligence value of local geographic knowledge. Arms blacksmiths became critical village infrastructure. The economic ecology was functionally complete — every role the village needed was filled, under severe stress.',
+roles:['Ji-samurai (farmer-warrior)','Ashigaru (village foot soldier)','Headman / negotiator','Arms blacksmith','Rice farmer','Itinerant monk','Scout / local intelligence'],
+trades:['Weapons and armor (new trade)','Food (strategic commodity)','Horses','Local knowledge / intelligence'],
+notable:'Villages formed their own militias, fortified key points, and played daimyo against each other for favorable terms — tax exemptions, non-interference, protection. An era of extraordinary village political agency.',
+why:'7 — Forced complete self-sufficiency creates the full trade and social ecosystem, at enormous human cost.'},
+
+{ab:'MOM',name:'Azuchi-Momoyama',range:'1568–1600 CE',score:5,tier:'amber',label:'Class separation enforced',
+summary:'Hideyoshi\'s Sword Hunt (1588) and heinō bunri — the legal separation of warrior and farmer classes — restructured village society permanently. Castle towns absorbed the merchant and craftsman functions that had previously operated within or adjacent to villages.',
+extra:'Cadastral surveys (kenchi) precisely measured and recorded all farmland, fixing farmers to specific plots and making tax evasion structurally much harder. Disarming villages was about eliminating the possibility of another Yamashiro no Kuni Ikki — removing weapons, legal standing, and mobility from the farming class in a single policy sequence. Hideyoshi created the stable agrarian base that made the Edo system possible. Old structures were gone; new ones were not yet operational.',
+roles:['Farmer (legally fixed in place)','Castle town merchant','Craftsman (castle-adjacent)','Tea ceremony master (new elite role)','Mine worker','Buddhist monk (power declining)'],
+trades:['Rice (standardized koku system)','Castle construction materials','Tea goods','Silver and gold (mine output)'],
+notable:'The most engineered transition in Japanese village history. Hideyoshi\'s policies created the preconditions for Edo by breaking the autonomous village structures of the Muromachi era.',
+why:'5 — Old structures dismantled, new ones not yet settled. A transitional trough.'},
+
+{ab:'EDO',name:'Edo',range:'1603–1868 CE',score:10,tier:'teal',label:'◆ Gold standard — the complete village',
+summary:'260 years of enforced peace enabled extreme role specialization within the mura (village), which functioned as a complete self-governing social and economic organism. Every role was legally codified, culturally embedded, and economically necessary — including the eta (leather workers) and hinin (outcast laborers) whom other societies rendered legally invisible.',
+extra:'The gonin-gumi (five-household mutual responsibility groups) created governance through collective liability — every household responsible for every other household\'s tax compliance, behavior, and welfare. Villages ran terakoya (literacy schools), managed communal forests and irrigation networks, organized matsuri as both religious and social infrastructure, and maintained formal negotiating positions relative to their domain lords. The night soil economy — human waste purchased from households, resold to farmers as fertilizer — is the clearest illustration: nothing left the system. Regional specialization (Nishijin silk, Mino washi, Bizen pottery, Echizen lacquerware) built inter-village trade networks spanning the entire country.',
+roles:['Nanushi / shōya (headman)','Hyakushō (landowning farmer)','Kōsaku (tenant farmer)','Blacksmith','Carpenter','Sake brewer','Soy sauce maker','Tofu maker','Miso maker','Herbal doctor','Terakoya schoolteacher','Buddhist priest','Shinto priest','Midwife','Night soil collector','Charcoal burner','Itinerant peddler','Eta (leather / butchery)','Hinin (outcast laborer)'],
+trades:['Rice (currency standard)','Sake','Soy sauce','Miso','Tofu','Silk and cotton cloth','Pottery','Lacquerware','Paper','Charcoal','Night soil (fertilizer commodity)','Timber','Rope and matting'],
+notable:'Gonin-gumi enforced collective governance through mutual liability. Villages ran literacy schools, managed communal forest and water rights, and maintained formal negotiating positions relative to domain lords.',
+why:'10 — Every trade, role, and social persona legally defined and culturally embedded. Nothing like it existed before or has existed after.'},
+
+{ab:'MEI',name:'Meiji',range:'1868–1912 CE',score:4,tier:'gray',label:'Modernization disruption',
+summary:'Land reform (1873) replaced village-based tenure with individual title and cash taxation, forcing farmers to sell produce into national markets rather than participate in the local exchange economy. Villages became the lowest administrative tier of a prefectural system designed for standardization and extraction.',
+extra:'Imported factory ceramics were cheaper than local pottery; machine-spun cotton undercut village weaving; centrally produced iron tools displaced the local blacksmith. Each craft trade collapsed through a quiet failure of the next generation to see any economic future in learning it. The silk export boom of the 1880s–90s temporarily reversed this in some villages, but global silk prices collapsed in the 1930s. By 1910 the village was already structurally an administrative unit.',
+roles:['Tenant farmer (increased numbers)','Factory migrant (from village)','Primary school teacher','State Shinto priest','Agricultural cooperative member','Local government official'],
+trades:['Rice (still primary)','Silk (brief export boom)','Factory goods replacing village crafts'],
+notable:'Imported ceramics, textiles, and iron goods killed off traditional craft trades faster than any war or disaster had managed. Market integration dismantled villages faster than violence had.',
+why:'4 — Market integration breaks village self-sufficiency faster than it builds alternatives.'},
+
+{ab:'TAI',name:'Taishō',range:'1912–1926 CE',score:3,tier:'gray',label:'Rural poverty and union movements',
+summary:'Rural poverty intensified sharply through the 1910s and 1920s. The Rice Riots of 1918 — nationwide unrest triggered by rice price inflation — exposed how completely the village food economy had become subordinate to urban market forces. Tenant farmer unions organized politically but could not reverse structural decline.',
+extra:'Tenant rates had climbed above 50% in many regions, rural debt was chronic, and cash-crop dependency meant a bad price year could bankrupt farmers who had survived centuries of bad harvests. Village craft traditions continued to die without successors. The gap between urban modernity and rural poverty widened through the decade.',
+roles:['Tenant farmer (organized)','Labor union organizer','Seasonal factory migrant','Agricultural cooperative member','Local schoolteacher'],
+trades:['Rice (income declining)','Silk (volatile)','Cooperative-distributed manufactured goods'],
+notable:'Rice Riots of 1918 exposed the structural subordination of village food production to urban demand. Tenant rates exceeded 50% in many regions.',
+why:'3 — Organizing responds to decline but cannot reverse it. The village trade ecology continues to dismantle.'},
+
+{ab:'ESH',name:'Early–Mid Shōwa',range:'1926–1945 CE',score:2,tier:'gray',label:'War mobilization',
+summary:'Rural men conscripted en masse. Women, children, and the elderly maintained agriculture under extreme duress. Village social cohesion persisted by necessity while the state deliberately repurposed traditional community structures for military mobilization.',
+extra:'The tonarigumi (neighborhood groups), introduced in 1940, revived the form of the Edo-era gonin-gumi — mandatory small group membership, collective responsibility, regular assembly — and deployed it for air raid preparation, conscription support, and food rationing. Village organization was turned against itself. The postwar American occupation abolished tonarigumi specifically because they were recognized as instruments of totalitarian mobilization.',
+roles:['Farmer (women and elderly)','Home-front laborer','Fujinkai women\'s group member','Tonarigumi unit leader','Food requisition officer'],
+trades:['Food (requisitioned as national priority)','Military supply materials'],
+notable:'Tonarigumi revived the Edo gonin-gumi structure in visual form but deployed it for military mobilization — the structure of community used against its own historical purpose.',
+why:'2 — Villages are mobilized state organs. Community structure persists as an instrument of state control.'},
+
+{ab:'POS',name:'Postwar reconstruction',range:'1945–1960 CE',score:5,tier:'amber',label:'Overlooked renaissance',
+summary:'MacArthur\'s land reform (1946–47) redistributed farmland from absentee landlords to tenant farmers at controlled prices, creating Japan\'s most equitable rural land distribution in recorded history. A brief revival of small-farm village life followed, largely absent from standard histories of the economic miracle.',
+extra:'The owner-farmer class created by the land reform had no historical parallel — millions of households farming their own land with equity stakes for the first time. Satoyama (village woodland edge) economies briefly thrived: charcoal production from managed woodlands supported village income before propane displaced it, pre-hospital midwifery networks were still operational, and local cooperative structures organized around village production. It lasted roughly fifteen years before the 1960 income-doubling plan pulled the entire rural workforce toward urban factories.',
+roles:['Owner-farmer (entirely new class)','Agricultural cooperative (Nōkyō) member','Satoyama charcoal burner','Village craftsman (pre-industrial revival)','Black market trader','Midwife (pre-hospital era)'],
+trades:['Rice (now sold by owner-farmers)','Seasonal vegetables','Charcoal (satoyama woodland economy)','Black market goods','Brief craft revival'],
+notable:'The 1946–47 land reform was the most radical redistribution in Japanese history, creating an owner-farmer class with no historical precedent. Lasted ~15 years before industrial pull ended it.',
+why:'5 — A renaissance most histories overlook. The 1960s high-growth era destroyed it faster than the land reform built it.'},
+
+{ab:'HSG',name:'High-growth / Late Shōwa',range:'1960–1989 CE',score:2,tier:'gray',label:'Rural exodus and hollowing',
+summary:'Mass migration to cities hollowed village populations at a rate unprecedented in Japanese history. By 1970 Japan was majority urban for the first time. Traditional craft trades died without successors in a single generation. "Genkai shuraku" — marginal villages unable to maintain basic services — began appearing in official reports.',
+extra:'Young rural adults in the 1960s saw that factory wages in Osaka or Tokyo were three to five times what farming could provide. They left. Entire lineages of craft knowledge — Edo-era lacquerware techniques, natural indigo dyeing, hand-papermaking, thatching — died without successors during this decade. Once a village\'s population fell below the threshold needed to maintain irrigation, festivals, schools, or shrine maintenance, the collapse was rapid and irreversible.',
+roles:['Elderly subsistence farmer','Agricultural cooperative official','Part-time farmer / full-time commuter','Village assembly member (declining)'],
+trades:['Subsidized rice (heavily protected)','Cooperative-distributed goods'],
+notable:'Craft traditions that had survived wars, famines, and Meiji modernization died in a single decade for lack of successors willing to stay. Population halved in many villages within ten years.',
+why:'2 — Villages lose their trade ecology and population base simultaneously. Functional collapse of the village as a social form.'},
+
+{ab:'REI',name:'Heisei / Reiwa',range:'1989–present',score:3,tier:'gray',label:'Niche revival movements',
+summary:'Furusato nōzei (hometown tax diversion), chiiki okoshi kyōryōtai (regional cooperation teams), and COVID-era remote-work migration have created micro-revivals in specific villages — curated exceptions, not systemic recovery of village trade ecology.',
+extra:'Individual villages have become models: Kamikatsu (zero-waste, 45 recycling categories), Kamiyama (which attracted tech companies and artists through broadband installation), Nishiawa (a living museum of thatched-roof farmhouse life). They succeed because they are exceptions. The conditions that produced Edo-era village self-sufficiency — a closed national market, legal obligation to remain, a craft economy where local production was competitive — no longer exist. What survives is artisanal, ornamental, and niche.',
+roles:['Artisanal / organic farmer','Remote-work migrant (new type)','Regional revitalization officer','Craft revivalist (pottery, weaving)','Rural NPO coordinator','Agri-tourism host'],
+trades:['Specialty agricultural products','Revived craft goods (niche)','Rural tourism','Remote professional services'],
+notable:'Individual villages — Kamikatsu, Kamiyama, Nishiawa — have become international models. They are curated exceptions, not a system.',
+why:'3 — Pockets of revival exist; the trade ecology remains structurally dismantled. Village life is ornamental in modern Japan.'}
+];
+
+let cur=11;
+
+function buildChart(){
+  const chartDiv=document.getElementById('chart-row');
+  const lblDiv=document.getElementById('lbl-row');
+  chartDiv.innerHTML='';lblDiv.innerHTML='';
+  P.forEach((p,i)=>{
+    const c=C[p.tier];
+    const h=Math.max(3,Math.round(p.score*9));
+    const active=i===cur;
+    const col=document.createElement('div');
+    col.className='bar-col';
+    col.onclick=()=>sel(i);
+    col.innerHTML=`<div style="flex:1"></div>
+      <div class="bar-inner" style="width:100%;height:${h}px;background:${c.bar};border-radius:2px 2px 0 0;opacity:${active?1:.32};transition:opacity .15s;${active?'box-shadow:0 0 0 1.5px '+c.bar:''}"></div>`;
+    chartDiv.appendChild(col);
+    const lbl=document.createElement('div');
+    lbl.style.cssText='flex:1;text-align:center';
+    lbl.innerHTML=`<span style="font-size:7.5px;color:${active?'#a09d94':'#5e5b54'};display:block;line-height:1">${p.ab}</span>`;
+    lblDiv.appendChild(lbl);
+  });
+}
+
+function buildDetail(i){
+  const p=P[i];const c=C[p.tier];
+  const roleRows=p.roles.map(r=>`<div class="d-row">${r}</div>`).join('');
+  const tradeRows=p.trades.map(t=>`<div class="d-row">${t}</div>`).join('');
+  document.getElementById('detail').innerHTML=`
+<div class="d-card" style="border-top:2.5px solid ${c.bar}">
+  <div class="d-head">
+    <span class="d-name">${p.name}</span>
+    <span class="d-range">${p.range}</span>
+    <span class="d-score" style="color:${c.bar}">${p.score}/10</span>
+  </div>
+  <div class="d-bar-row">
+    <div class="d-bar-bg"><div class="d-bar-fill" style="width:${p.score*10}%;background:${c.bar}"></div></div>
+    <span class="d-label-pill" style="background:${c.pill};color:${c.pillTx}">${p.label}</span>
+  </div>
+  <p class="d-summary">${p.summary}</p>
+  <p class="d-extra">${p.extra}</p>
+  <div class="d-cols">
+    <div><div class="d-col-hd">KEY ROLES</div>${roleRows}</div>
+    <div><div class="d-col-hd">TRADE GOODS</div>${tradeRows}</div>
+  </div>
+  <div class="d-notable" style="border-left:3px solid ${c.bar}">
+    <div class="d-notable-hd">NOTABLE</div>
+    <div class="d-notable-txt">${p.notable}</div>
+  </div>
+  <div class="d-why">${p.why}</div>
+</div>`;
+}
+
+function sel(i){cur=i;buildChart();buildDetail(i);}
+buildChart();buildDetail(cur);
+</script>
+</body>
+</html>
