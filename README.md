@@ -8,4 +8,4 @@ A collection of personal projects.
 
 | Project | Description |
 |---|---|
-| [japanese_villages](./japanese_villages/) | Interactive era-by-era index of Japanese village economy flourishing (~14,000 BCE to present), built as reference material for a game design project |
+| [japanese_villages](./japanese_villages/) | Interactive era-by-era tour of Japanese village economy and trade models (~14,000 BCE to present), built as reference material for a game design project |
