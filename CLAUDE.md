@@ -15,3 +15,4 @@ A public collection of personal projects. Each project lives in its own top-leve
 ## Project Index
 
 - `japanese_villages/` — Interactive era-by-era index of Japanese village economy flourishing (~14,000 BCE to present), built as reference material for a game design project
+- `fidelity-to-markdown/` — CLI ETL pipeline that converts Fidelity brokerage positions CSV exports into LLM-ready markdown tables for portfolio analysis
